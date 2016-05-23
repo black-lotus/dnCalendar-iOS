@@ -10,21 +10,20 @@ import UIKit
 
 extension NSDate {
     func startOfMonth() -> NSDate? {
-        guard
-            let cal: NSCalendar = NSCalendar.currentCalendar(),
-            let comp: NSDateComponents = cal.components([.Year, .Month], fromDate: self) else { return nil }
-        comp.to12pm()
-        return cal.dateFromComponents(comp)!
+        let calendar = NSCalendar.currentCalendar()
+        let currentDateComponents = calendar.components([.Year, .Month, .Day], fromDate: self)
+        return calendar.dateFromComponents(currentDateComponents)
     }
     
     func endOfMonth() -> NSDate? {
-        guard
-            let cal: NSCalendar = NSCalendar.currentCalendar(),
-            let comp: NSDateComponents = NSDateComponents() else { return nil }
-        comp.month = 1
-        comp.day -= 1
-        comp.to12pm()
-        return cal.dateByAddingComponents(comp, toDate: self.startOfMonth()!, options: [])!
+        let calendar = NSCalendar.currentCalendar()
+        let dayRange = calendar.rangeOfUnit(.Day, inUnit: .Month, forDate: self)
+        let dayCount = dayRange.length
+        let comp = calendar.components([.Year, .Month, .Day], fromDate: self)
+        
+        comp.day = dayCount
+        
+        return calendar.dateFromComponents(comp)!
     }
     
     func dayIndex() -> Int {

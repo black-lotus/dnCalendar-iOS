@@ -88,7 +88,7 @@ extension ViewController: DNCalendarDataSource {
     }
     
     func dnCalendarMaxDate() -> NSDate? {
-        let date: NSDate = NSDate.parseStringIntoDate("2016-12-30", format: "yyyy-MM-dd")
+        let date: NSDate = NSDate.parseStringIntoDate("2017-05-30", format: "yyyy-MM-dd")
         return date
     }
     

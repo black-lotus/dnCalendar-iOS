@@ -9,7 +9,7 @@
 import UIKit
 
 public class DNCalendarViewController: UIViewController {
-
+    
     // MARK: - Public Properties
     public let calendarView: DNCalendarView
     public let scrollView: UIScrollView
@@ -39,7 +39,7 @@ public class DNCalendarViewController: UIViewController {
     public required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
 }
 
 // MARK: - Scroll View
@@ -52,6 +52,8 @@ extension DNCalendarViewController: UIScrollViewDelegate {
     
     public func scrollViewDidEndDecelerating(scrollView: UIScrollView) {
         if (self.lastContentOffset! < scrollView.contentOffset.x) {
+            print("MOVE TO LEFT")
+            
             // moved right
             increasePresentedDate()
             
@@ -61,6 +63,8 @@ extension DNCalendarViewController: UIScrollViewDelegate {
             // re-draw calendar
             draw()
         } else if (self.lastContentOffset! > scrollView.contentOffset.x) {
+            print("MOVE TO RIGHT")
+            
             // moved left
             decreasePresentedDate()
             
@@ -90,7 +94,7 @@ extension DNCalendarViewController: UIScrollViewDelegate {
             calendarView.calendarModel.presentedYear = calendarView.calendarModel.presentedYear - 1
         }
     }
-
+    
 }
 
 // MARK: - UI Refresh
@@ -127,27 +131,13 @@ extension DNCalendarViewController {
     func draw() {
         var showPrevMonth: Bool = true
         var showNextMonth: Bool = true
-        
-        let cal = NSCalendar.currentCalendar()
-        if let minDate: NSDate = calendarView.dataSource.dnCalendarMinDate() {
-            let component: NSDateComponents = cal.components([NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: minDate)
-            print("min date => month \(component.month), year \(component.year)")
-            if component.year <= calendarView.calendarModel.presentedYear {
-                if component.month >= calendarView.calendarModel.presentedMonth {
-                    showPrevMonth = false
-                }
-            }
+
+        if calendarView.calendarModel.isLessThanMinimumDate() == true {
+            showPrevMonth = false
         }
         
-        if let maxDate: NSDate = calendarView.dataSource.dnCalendarMaxDate() {
-            let component: NSDateComponents = cal.components([NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: maxDate)
-            print("max date => month \(component.month), year \(component.year)")
-            if component.year >= calendarView.calendarModel.presentedYear {
-                if component.month <= calendarView.calendarModel.presentedMonth {
-                    showNextMonth = false
-                }
-            }
-
+        if calendarView.calendarModel.isGreaterThanMaximumDate() == true {
+            showNextMonth = false
         }
         
         // remove all subview
@@ -197,10 +187,10 @@ extension DNCalendarViewController {
     func insertMonthView(view: UIView, withIdentifier identifier: String, showPrevious: Bool, showFollowing: Bool) {
         let index: CGFloat
         switch identifier {
-            case "previous": index = 0
-            case "presented": index = (showPrevious == true) ? 1 : 0
-            case "following": index = (showPrevious == true) ? 2 : 1
-            default: index = -1
+        case "previous": index = 0
+        case "presented": index = (showPrevious == true) ? 1 : 0
+        case "following": index = (showPrevious == true) ? 2 : 1
+        default: index = -1
         }
         
         view.frame.origin = CGPoint(x: scrollView.bounds.width * index, y: 0)
@@ -273,7 +263,7 @@ extension DNCalendarViewController {
                 }
             }
         }
-    
+        
         
         for constraintIn in calendarView.constraints where
             constraintIn.firstAttribute == NSLayoutAttribute.Height {
@@ -286,7 +276,7 @@ extension DNCalendarViewController {
                 break
         }
     }
-
+    
     private func layoutViews(views: [UIView], toHeight height: CGFloat) {
         scrollView.frame.size.height = height
         
@@ -301,6 +291,6 @@ extension DNCalendarViewController {
             view.layoutIfNeeded()
         }
     }
-
+    
 }
 

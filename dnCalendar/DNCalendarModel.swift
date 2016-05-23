@@ -58,6 +58,45 @@ public class DNCalendarModel {
         return (month: component.month, year: component.year)
     }
     
+    func isLessThanMinimumDate() -> Bool {
+        var isLessThanMinimumDate: Bool = false
+        
+        if let dataSource = self.dataSource {
+            let cal = NSCalendar.currentCalendar()
+            if let minDate: NSDate = dataSource.dnCalendarMinDate() {
+                let component: NSDateComponents = cal.components([NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: minDate)
+                
+                if component.year >= presentedYear {
+                    if component.month >= presentedMonth {
+                        isLessThanMinimumDate = true
+                    }
+                }
+            }
+        }
+        
+        
+        return isLessThanMinimumDate
+    }
+    
+    func isGreaterThanMaximumDate() -> Bool {
+        var isGreaterThanMaximumDate: Bool = false
+        
+        if let dataSource = self.dataSource {
+            let cal = NSCalendar.currentCalendar()
+            if let maxDate: NSDate = dataSource.dnCalendarMaxDate() {
+                let component: NSDateComponents = cal.components([NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: maxDate)
+                
+                if component.year <= presentedYear {
+                    if component.month <= presentedMonth {
+                        isGreaterThanMaximumDate = true
+                    }
+                }
+            }
+        }
+        
+        return isGreaterThanMaximumDate
+    }
+    
     func getWeekOfMonth(month: Int, year: Int) -> Array<Array<Int>> {
         var weeks: Array<Array<Int>> = Array<Array<Int>>()
         
@@ -83,6 +122,8 @@ public class DNCalendarModel {
         
         var startPrevDay: Int = lastDayPrev - weekDayFirstMonth
         var startNextDay: Int = 1
+        
+        print("month \(month), year \(year) => \(numDays)")
         
         var date: Int = 1
         while (date <= numDays) {
@@ -122,19 +163,6 @@ public class DNCalendarModel {
             
             weeks.append(tempWeek)
         }
-        
-        print("-------------------------")
-        print("month => \(month), year => \(year)")
-        print("-------------------------")
-        for i in 0..<weeks.count {
-            var p = ""
-            for j in 0..<weeks[i].count {
-                p += "\(weeks[i][j]) "
-            }
-            
-            print(p)
-        }
-        print("-------------------------")
         
         return weeks
     }
