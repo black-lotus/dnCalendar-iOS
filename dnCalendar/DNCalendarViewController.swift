@@ -131,7 +131,7 @@ extension DNCalendarViewController {
     func draw() {
         var showPrevMonth: Bool = true
         var showNextMonth: Bool = true
-
+        
         if calendarView.calendarModel.isLessThanMinimumDate() == true {
             showPrevMonth = false
         }

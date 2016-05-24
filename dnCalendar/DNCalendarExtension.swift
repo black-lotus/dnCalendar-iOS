@@ -71,14 +71,6 @@ extension NSDate {
     }
 }
 
-internal extension NSDateComponents {
-    func to12pm() {
-        self.hour = 12
-        self.minute = 0
-        self.second = 0
-    }
-}
-
 extension UIView {
     public func removeAllSubviews() {
         for subview in subviews {

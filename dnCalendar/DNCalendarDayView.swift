@@ -21,8 +21,10 @@ public class DNCalendarDayView: UIView {
         self.calendarView = calendarView
         super.init(frame: frame)
         
-        let components: NSDateComponents = self.cal.components(NSCalendarUnit.Day, fromDate: date)
+        let components: NSDateComponents = self.cal.components([NSCalendarUnit.Day, NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: date)
         let day: Int = components.day
+        let month: Int = components.month
+        let year: Int = components.year
         
         self.backgroundColor = UIColor.whiteColor()
         
@@ -90,28 +92,36 @@ public class DNCalendarDayView: UIView {
         
         // validate minimum date
         if let minDate: NSDate = calendarView.dataSource.dnCalendarMinDate() {
-            if date.compare(minDate) == .OrderedAscending {
+            let minDateComponent: NSDateComponents = cal.components([NSCalendarUnit.Day, NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: minDate)
+            
+            let tempMinDate: NSDate = NSDate.parseStringIntoDate("\(minDateComponent.year)-\(minDateComponent.month)-\(minDateComponent.day)", format: "yyyy-MM-dd")
+            if date.compare(tempMinDate) == .OrderedAscending {
                 disableDate = true
             }
+            
         }
         
         // validate maximum date
         if let maxDate: NSDate = calendarView.dataSource.dnCalendarMaxDate() {
-            if date.compare(maxDate) == .OrderedDescending {
+            let maxDateComponent: NSDateComponents = cal.components([NSCalendarUnit.Day, NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: maxDate)
+            
+            let tempMaxDate: NSDate = NSDate.parseStringIntoDate("\(maxDateComponent.year)-\(maxDateComponent.month)-\(maxDateComponent.day)", format: "yyyy-MM-dd")
+            if date.compare(tempMaxDate) == .OrderedDescending {
                 disableDate = true
             }
+            
         }
         
         // add supplmentary view
         if let supplementView: UIView = calendarView.dataSource.dnCalendarSupplementaryView(date, frame: CGRectMake(0, 0, frame.size.width, frame.size.height)) {
-            print("supplementView setup")
             self.addSubview(supplementView)
         }
         
         if let defaultDate: NSDate = calendarView.dataSource.dnCalendarDefaultDate() {
-            if date.compare(defaultDate) == .OrderedSame {
+            let defaultDateComponent: NSDateComponents = cal.components([NSCalendarUnit.Day, NSCalendarUnit.Month, NSCalendarUnit.Year], fromDate: defaultDate)
+            
+            if defaultDateComponent.year == year && defaultDateComponent.month == month && defaultDateComponent.day == day {
                 if let defaultDateView: UIView = calendarView.dataSource.dnCalendarDefaultDateView(CGRectMake(0, 0, frame.size.width, frame.size.height)) {
-                    print("defaultView setup")
                     self.addSubview(defaultDateView)
                 }
                 
@@ -123,12 +133,13 @@ public class DNCalendarDayView: UIView {
         
         // disable view
         if disableDate == true {
+            print("date => \(date.description) is disabled => \(day)")
             if let disabledView: UIView = calendarView.dataSource.dnCalendarDisabledView(CGRectMake(0, 0, frame.size.width, frame.size.height)) {
-                print("disabled view setup")
+                // print("disabled view setup")
                 self.addSubview(disabledView)
             }
         } else {
-            let gesture = UITapGestureRecognizer(target: self, action: #selector(someAction))
+            let gesture = UITapGestureRecognizer(target: self, action: #selector(tapAction))
             self.addGestureRecognizer(gesture)
         }
     }
@@ -137,9 +148,9 @@ public class DNCalendarDayView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func someAction(sender: UITapGestureRecognizer){
+    func tapAction(sender: UITapGestureRecognizer){
         print("date => \(self.date.description)")
         self.calendarView.delegate.dnCalendarDidSelectDay(self)
     }
-
+    
 }
